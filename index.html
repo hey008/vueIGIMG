@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Vue: Download Images</title>
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+<style>
+	.thumb { margin: 3px; display: inline-block; }
+	.thumb img { max-height: 50px; border: 1px solid white; }
+	.thumb.selected img { border: 1px solid red; }
+	#sURL { width: calc(100% - 200px); }
+	textarea { width: 0px; height: 0px; }
+</style>
+<body>
+	<div id='vueapp' class="container-fluid">
+		<div class="row p-2">
+			<div class="col-md-8">
+				<label>URL</label>
+				<input type="text" name="sURL" id="sURL" v-model="sURL">
+				<input type="button" @click="downloadImage()" v-model="btnAdd">
+			</div>
+			<div class="col text-right">
+				<textarea id="bbCode" v-model="bbCode"></textarea>
+				<input type="button" @click="copyToClipboard('#bbCode')" value="Copy as BBCODE">
+			</div>
+		</div>
+		<div class="thumb" v-for='image in images' v-bind:class="{ selected: image.state }">
+			<img class="" :src="'./files/'+ image.src" :key="image.src" @click="selectImage(image)">
+		</div>
+	</div>
+</body>
+<script>
+	var app = new Vue({
+		el: '#vueapp',
+		data: {sURL:'', images:[], bbCode:"", btnAdd:"Add"},
+		mounted: function () {
+			this.getImages();
+		},
+		methods: {
+			getImages: function(){
+				axios.get('api.php')
+				.then(function (response) {
+					let rData = response.data;
+					let tData = [];
+					rData.forEach(function(value, key){
+						tData[key] = {'src': value,'state': false};
+        			});
+					app.images = tData;
+				})
+				.catch(function (error) {
+					console.log(error);
+				});
+			},
+			downloadImage: function(){
+				if (this.sURL == "") { return false; }
+				app.btnAdd = "Loading...";
+				let formData = new FormData();
+        		formData.append('mode', "SAVE");
+				formData.append('url', this.sURL);
+
+				axios({
+					method: 'post',
+					url: 'api.php',
+					data: formData,
+					config: { headers: {'Content-Type': 'multipart/form-data' }}
+				})
+				.then(function (response) {
+					//handle success
+					//app.images.push(response.data[0]);
+					app.images.unshift({'src': response.data[0],'state': false});
+					app.resetForm();
+					app.btnAdd = "Add";
+				})
+				.catch(function (response) {
+					//handle error
+					console.log(response);
+					app.btnAdd = "Add";
+				});
+			},
+			resetForm: function(){
+				this.sURL = '';
+			},
+			selectImage: function(image){
+				if (image.state === false) {
+					image.state = true;
+				} else {
+					image.state = false;
+				}
+
+				app.bbCode = "";
+				app.images.forEach(function(value, key){
+					if (value.state === true) {
+						app.bbCode	+= "[URL]"+ value.src +"[/URL]\n";
+					}
+				});
+
+				//app.copyToClipboard('#bbCode');
+			},
+			copyToClipboard: function(src) {
+				// Copy to clipboard...
+				let testingCodeToCopy = document.querySelector(src);
+				testingCodeToCopy.setAttribute('type', 'text');
+				testingCodeToCopy.select();
+				
+				try {
+					var successful = document.execCommand('copy');
+					var msg = successful ? 'successful' : 'unsuccessful';
+					console.log('Testing code was copied ' + msg);
+				} catch (err) {
+					console.log('Oops, unable to copy');
+				}
+
+				/* unselect the range */
+				//testingCodeToCopy.setAttribute('type', 'hidden');
+				window.getSelection().removeAllRanges();
+			}
+		}
+	});
+</script>
+</html>
