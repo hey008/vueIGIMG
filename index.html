@@ -20,9 +20,14 @@
 	<div id='vueapp' class="container-fluid">
 		<div class="row p-2">
 			<div class="col-md-8">
-				<label>URL</label>
-				<input type="text" name="sURL" id="sURL" v-model="sURL">
-				<input type="button" @click="downloadImage()" v-model="btnAdd">
+				<div class="input-group">
+					<div class="input-group-prepend"><span class="input-group-text" id="inputGroupPrepend">URL</span></div>
+					<input type="text" class="form-control" name="sURL" id="sURL" v-model="sURL" v-on:keyup.enter="downloadImage">
+					<div class="invalid-feedback">URL</div>
+					<div class="input-group-append">
+						<input type="button" class="btn btn-primary" @click="downloadImage()" v-model="btnAdd">
+					</div>
+				</div>
 			</div>
 			<div class="col text-right">
 				<textarea id="bbCode" v-model="bbCode"></textarea>
@@ -37,7 +42,7 @@
 <script>
 	var app = new Vue({
 		el: '#vueapp',
-		data: {sURL:'', images:[], bbCode:"", btnAdd:"Add"},
+		data: {sURL:'', images:[], bbCode:"", btnAdd:"Download"},
 		mounted: function () {
 			this.getImages();
 		},
@@ -74,12 +79,12 @@
 					//app.images.push(response.data[0]);
 					app.images.unshift({'src': response.data[0],'state': false});
 					app.resetForm();
-					app.btnAdd = "Add";
+					app.btnAdd = "Download";
 				})
 				.catch(function (response) {
 					//handle error
 					console.log(response);
-					app.btnAdd = "Add";
+					app.btnAdd = "Download";
 				});
 			},
 			resetForm: function(){
