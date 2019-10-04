@@ -11,7 +11,7 @@
 </head>
 <style>
 	.thumb { margin: 3px; display: inline-block; }
-	.thumb img { max-height: 50px; border: 1px solid white; }
+	.thumb img { height: 120px; border: 1px solid white; }
 	.thumb.selected img { border: 1px solid red; }
 	#sURL { width: calc(100% - 200px); }
 	textarea { width: 0px; height: 0px; }
@@ -30,7 +30,7 @@
 			</div>
 		</div>
 		<div class="thumb" v-for='image in images' v-bind:class="{ selected: image.state }">
-			<img class="" :src="'./files/'+ image.src" :key="image.src" @click="selectImage(image)">
+			<img class="" :src="'./files/thumbs/'+ image.src" :key="image.src" @click="selectImage(image)">
 		</div>
 	</div>
 </body>
