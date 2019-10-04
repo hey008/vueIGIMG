@@ -18,7 +18,6 @@ function saveImg($url, $fType) {
 	//echo "Success"; 
 
 	if(!is_dir(IMAGEPATH)){ mkdir(IMAGEPATH, 0755);}
-	if(!is_dir(IMAGEPATH . "thumbs")){ mkdir(IMAGEPATH . "thumbs", 0755);}
 
 	createThumb($fName);
 
@@ -29,6 +28,8 @@ function saveImg($url, $fType) {
 # ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- 
 
 function createThumb($fName) {
+	if(!is_dir(IMAGEPATH . "thumbs")){ mkdir(IMAGEPATH . "thumbs", 0755);}
+	
 	# Create Thumb
 	$fPath = IMAGEPATH . $fName;
 	$fInfo = getimagesize($fPath);
