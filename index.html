@@ -7,7 +7,9 @@
 	<title>Vue: Download Images</title>
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/vue"></script>
-    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+	<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+	<script src="libs/vue-easy-lightbox/vue-easy-lightbox.umd.min.js"></script>
+
 </head>
 <style>
 	.thumb { margin: 3px; display: inline-block; }
@@ -17,32 +19,55 @@
 	textarea { width: 0px; height: 0px; }
 </style>
 <body>
-	<div id='vueapp' class="container-fluid">
-		<div class="row p-2">
-			<div class="col-md-8">
-				<div class="input-group">
-					<div class="input-group-prepend"><span class="input-group-text" id="inputGroupPrepend">URL</span></div>
-					<input type="text" class="form-control" name="sURL" id="sURL" v-model="sURL" v-on:keyup.enter="downloadImage">
-					<div class="invalid-feedback">URL</div>
-					<div class="input-group-append">
-						<input type="button" class="btn btn-primary" @click="downloadImage()" v-model="btnAdd">
+	<div id='vueapp'>
+		<nav class="navbar fixed-top">
+			<div class="w-100 d-flex">
+				<div class="form-inline mb-2">
+					<div class="input-group input-group-sm">
+						<div class="input-group-prepend"><span class="input-group-text" id="inputGroupPrepend">URL</span></div>
+						<input type="text" class="form-control" name="sURL" id="sURL" v-model="sURL" v-on:keyup.enter="downloadImage" autocomplete="off">
+						<div class="invalid-feedback">URL</div>
+						<div class="input-group-append">
+							<input type="button" class="btn btn-primary" @click="downloadImage()" v-model="btnAdd">
+						</div>
+					</div>
+				</div>
+				<div class="ml-auto text-right" v-bind:style="{ display: btnGroup }">
+					<div class="btn-group btn-group-sm">
+						<input type="button" class="btn btn-secondary" @click="copyToClipboard('#bbCode')" value="BBCODE">
+						<input type="button" class="btn btn-primary" @click="() => showImg(0)" value="VIEW">
 					</div>
 				</div>
 			</div>
-			<div class="col text-right">
-				<textarea id="bbCode" v-model="bbCode"></textarea>
-				<input type="button" @click="copyToClipboard('#bbCode')" value="Copy as BBCODE">
+		</nav>
+		<div class="container-fluid mt-4 pt-4">
+			<div class="row p-2">
+				<div class="col">
+					<div class="thumb" v-for='image in images' v-bind:class="{ selected: image.state }">
+						<img class="" :src="'./files/thumbs/'+ image.src" :key="image.src" @click="selectImage(image)">
+					</div>
+				</div>
 			</div>
 		</div>
-		<div class="thumb" v-for='image in images' v-bind:class="{ selected: image.state }">
-			<img class="" :src="'./files/thumbs/'+ image.src" :key="image.src" @click="selectImage(image)">
-		</div>
+		<textarea id="bbCode" v-model="bbCode"></textarea>
+		<vue-easy-lightbox
+			:visible="visible"
+			:imgs="imgs"
+			@hide="handleHide"
+		></vue-easy-lightbox>
 	</div>
 </body>
 <script>
 	var app = new Vue({
 		el: '#vueapp',
-		data: {sURL:'', images:[], bbCode:"", btnAdd:"Download"},
+		data: {
+			sURL:'', 
+			images:[], 
+			bbCode:"", 
+			btnAdd:"Download", 
+			btnGroup: "none",
+			imgs:[], 
+			visible: false},
 		mounted: function () {
 			this.getImages();
 		},
@@ -98,11 +123,19 @@
 				}
 
 				app.bbCode = "";
+				app.imgs = [];
 				app.images.forEach(function(value, key){
 					if (value.state === true) {
 						app.bbCode	+= "[URL]"+ value.src +"[/URL]\n";
+						app.imgs.push("./files/"+ value.src);
 					}
 				});
+
+				if (app.imgs.length > 0) {
+					app.btnGroup = "";
+				} else {
+					app.btnGroup = "none";
+				}
 
 				//app.copyToClipboard('#bbCode');
 			},
@@ -124,7 +157,37 @@
 				//testingCodeToCopy.setAttribute('type', 'hidden');
 				window.getSelection().removeAllRanges();
 			}
+			,showImg (index) {
+				console.log("here?");
+				this.index = index
+				this.visible = true
+			},
+			handleHide () {
+				this.visible = false
+			}
 		}
 	});
 </script>
+<script>
+		var app1 = new Vue({
+		  el: '#apppp',
+		  data: {
+			visible: false,
+			imgs: [
+			  'https://via.placeholder.com/450.png/',
+			  'https://via.placeholder.com/300.png/',
+			  'https://via.placeholder.com/150.png/'
+			]
+		  },
+		  methods: {
+			showImg (index) {
+			  this.index = index
+			  this.visible = true
+			},
+			handleHide () {
+			  this.visible = false
+			}
+		  }
+		})
+	  </script>
 </html>
