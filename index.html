@@ -44,7 +44,7 @@
 			<div class="row p-2">
 				<div class="col">
 					<div class="thumb" v-for='image in images' v-bind:class="{ selected: image.state }">
-						<img class="" :src="'./files/thumbs/'+ image.src" :key="image.src" @click="selectImage(image)">
+						<img class="" :src="'./files/thumbs/'+ image.src" :key="image.src" @click="selectImage(image)" loading="lazy">
 					</div>
 				</div>
 			</div>
