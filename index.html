@@ -19,10 +19,10 @@
 	textarea { width: 0px; height: 0px; }
 </style>
 <body>
-	<div id='vueapp'>
-		<nav class="navbar fixed-top">
-			<div class="w-100 d-flex">
-				<div class="form-inline mb-2">
+	<div id='vueapp' class="m-0">
+		<nav class="navbar fixed-top p-0">
+			<div class="w-100 d-flex bg-light p-2">
+				<div class="form-inline">
 					<div class="input-group input-group-sm">
 						<div class="input-group-prepend"><span class="input-group-text" id="inputGroupPrepend">URL</span></div>
 						<input type="text" class="form-control" name="sURL" id="sURL" v-model="sURL" v-on:keyup.enter="downloadImage" autocomplete="off">
