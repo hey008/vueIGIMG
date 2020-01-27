@@ -126,7 +126,7 @@
 				app.imgs = [];
 				app.images.forEach(function(value, key){
 					if (value.state === true) {
-						app.bbCode	+= "[URL]"+ value.src +"[/URL]\n";
+						app.bbCode += "[img]"+ window.location.href + "files/" + value.src +"[/img]\n";
 						app.imgs.push("./files/"+ value.src);
 					}
 				});
